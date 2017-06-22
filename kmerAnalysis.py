@@ -111,6 +111,7 @@ def generateHistogram(xmin,xmax,interval,y):
                       right='off', labelright='off',
                       top='off', labeltop='off')
 
+    
 def extractSegmentMeans(kmerDataSeparated):
     '''
     Used in conjunction with the output TSV from plotF5.py to extract a list of segment mean values.
