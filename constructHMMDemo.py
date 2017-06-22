@@ -16,6 +16,7 @@
 #   PyPore
 #   demoNegativeReads (input TSV files)
 #   demoPositiveReads (input TSV files)
+#   MetaHMMBuilder.py
 
 from Fast5Types import *
 import numpy as np
