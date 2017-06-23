@@ -111,7 +111,6 @@ def generateHistogram(xmin,xmax,interval,y):
                       right='off', labelright='off',
                       top='off', labeltop='off')
 
-    
 def extractSegmentMeans(kmerDataSeparated):
     '''
     Used in conjunction with the output TSV from plotF5.py to extract a list of segment mean values.
@@ -154,20 +153,16 @@ def plotSegmentedSignals(signalsSeparated):
         if s==0:
             axes_s.set_title("Signal")
 
-        colors = ["red","blue","orange","purple","green","yellow","brown","black",[0.004, 0.702, 0.733]]
+        color = "black"
+        # if s==0:
+        #     color = "blue"
+        # else:
+        #     color = "black"
 
-        if s >= len(signalsSeparated)-2:
-            color = colors[-(s+1)]
-        else:
-            color = "black"
-
-        # plot.figure()
-        # panel = plot.axes()
-        # panel.plot(means)
 
         n = len(signal)
-        # length = 100 / float(n)
-        length = 5
+        length = 100 / float(n)
+        # length = 5
 
         for i,kmerMean in enumerate(signal):
             x0 = i*length
@@ -182,11 +177,7 @@ def plotSegmentedSignals(signalsSeparated):
             # print i,n,length,x0,x1,y
 
             axes_s.plot([x0,x1],[y,y],color=color)
-            # axes_s.text(x1, y, "%.3f"%y, ha="right", va="top", color="red", fontsize="5")
-            # axes_s.set_ylabel("%d"%s)
             axes_s.set_ylabel("Current (pA)")
-            # axes[s].set_ylim([0,150])
-            # axes[s].set_yticks(np.linspace(0,150,4))
 
             axes_s.tick_params(axis='both', which='both',
                           bottom='off', labelbottom='off',
@@ -196,4 +187,17 @@ def plotSegmentedSignals(signalsSeparated):
 
     # f.savefig("barcodeComparison2.png",dpi=600)
     plot.show()
+
+# #Example usage - for checking the expected signal of some synthetic barcodes
+
+# standardMeansFile = "kmerMeans"
+# kmercalc = KmerCalculator(standardMeansFile)
+#
+# meansB1 = kmercalc.calculateExpectedSignal("GGGTTCAATCAAGGGTTCAATCAAGGGTTCAATCAAGGGTTCAATCAAT")
+# meansB2 = kmercalc.calculateExpectedSignal("GGAACAAAGGAACAAAGGAACAAAGGAACAAAGGAACAAAGGAACAAAG")
+# meansB3 = kmercalc.calculateExpectedSignal("TCTCTCTCTCGGGGAGGGGATCTCTCTCTCGGGGAGGGATCTCTCTCTC")
+# meansB4 = kmercalc.calculateExpectedSignal("TCTCTCGGGAGGGATCTCTCGGGAGGGATCTCTCGGGAGGGATCTCTCT")
+# # meansB6 = kmercalc.calculateExpectedSignal("TTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCC")
+#
+# plotSegmentedSignals([meansB1,meansB2,meansB3,meansB4])
 
