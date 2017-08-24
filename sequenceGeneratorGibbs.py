@@ -1,8 +1,6 @@
 #!/usr/bin/env python2.7
 
 # Author: Ryan Lorig-Roach
-# The Sequence Generator class uses sampling to build a sequence that emits your signal of choice. It
-# probabilistically substitutes characters in a seed sequence corresponding to their error.
 
 import numpy
 import random
@@ -94,12 +92,12 @@ class SequenceGenerator:
         '''
         The master function
 
-        Phase 1: Generate random seeds (nSeeds)
-        Phase 2: Sample all seeds n times, then select best result for each seed (nIterations)
-        Phase 2: Prune seeds by keeping only the top n seeds (maxResults)
-        Phase 3: Refine top seeds by sampling, then selecting the top match from each sample (nIterations)
+        Stage 1: Generate random seeds (nSeeds)
+        Stage 2: Sample and substitute all seeds n times (nIterations), then select best result for each seed
+        Stage 2: Prune seeds by keeping only the top n seeds (maxResults)
+        Stage 3: Refine top seeds by sampling/substituting, then selecting the top match from each seed (nIterations)
 
-        Repeat phase 3 until convergence... scales by roughly 5x length of the sequence (nReseeds)
+        Repeat stage 3 until convergence (nReseeds)... scales by roughly 5x length of the sequence 
 
         Plot results with the first plot showing the template signal
         '''
@@ -114,6 +112,7 @@ class SequenceGenerator:
 
         for rs in range(self.nReseeds):
             if rs == 0:
+                # Stage 1
                 # on the first iteration, generate random seed sequences
                 seedSequences = [[random.choice(self.characters) for i in range(6+len(self.templateSignal)-1)] for s in range(self.nSeeds)]
                 for sequence in seedSequences:
@@ -121,14 +120,13 @@ class SequenceGenerator:
                     self.seeds.append(Seed(copy.deepcopy(sequence),seedSignal))  # initialize Seed object for each random sequence
 
             elif rs == 1:
+                # Stage 3
                 # from 2nd iteration on, refine only the best seeds of the first pass
                 self.pruneSeeds()
 
             for s,seed in enumerate(self.seeds):
+                # Stage 2/3, refine each seed
                 self.s = s
-                self.seeds[self.s].batch = list()
-
-                # print(self.seeds[self.s].signal)
 
                 scorePerIteration = list()  # for troubleshooting (and curiosity)
 
@@ -137,27 +135,19 @@ class SequenceGenerator:
                     newCharacter = self.selectSubstitutionByError(index)
 
                     self.seeds[self.s].sequence[index] = newCharacter
-                    self.seeds[self.s].signal = self.kmerCalculator.calculateExpectedSignal(self.seeds[self.s].sequence) #refresh signal
+                    self.seeds[self.s].signal = self.kmerCalculator.calculateExpectedSignal(self.seeds[self.s].sequence) # refresh signal
 
                     self.seeds[self.s].error = self.calculateTotalError()
-                    scorePerIteration.append(self.seeds[self.s].error)
+                    scorePerIteration.append(self.seeds[self.s].error)  # for diagnostic purposes
 
                     if self.seeds[self.s].error < self.seeds[self.s].bestError:
+                        # this seed's best error/sequence is now the current error/sequence
                         self.seeds[self.s].bestSequence = copy.deepcopy(self.seeds[self.s].sequence)
                         self.seeds[self.s].bestError = copy.deepcopy(self.seeds[self.s].error)
 
-                    # if j%10==0:
-                        # plotSegmentedSignals([self.templateSignal]+[self.signal])
-
-                # self.seeds[s] = copy.deepcopy(self.seed)
-
                 updateString = updateString + "%d %s : %f\n"%(s,''.join(self.seeds[self.s].bestSequence),self.seeds[self.s].bestError)
-                # print("%d %s: %f\n"%(s,''.join(self.seeds[self.s].bestSequence),self.seeds[self.s].bestError))
-                # print(len(updateString.split()))
-                # print(updateString)
 
                 if (s+1)%(self.maxResults) == 0 and s>0:
-                    # sys.stdout.flush()
                     if rs >0:
                         print(rs)
                     print(updateString.strip())
@@ -165,8 +155,6 @@ class SequenceGenerator:
 
                 # pyplot.plot(scorePerIteration)
                 pyplot.show()
-
-            # print('\n')
 
         if rs == (self.nReseeds - 1):
             string = ''
