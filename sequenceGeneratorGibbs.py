@@ -11,7 +11,7 @@ from kmerAnalysis import plotSegmentedSignals
 
 class KmerCalculator:
     '''
-    Performs low level functions on any given sequence. Requires a table of mean current values for all kmers.
+    Performs basic functions on DNA sequence. Requires a table of mean current values for all kmers.
     '''
     def __init__(self,kmerMeansFilename):
         self.k = 6
